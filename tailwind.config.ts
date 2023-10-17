@@ -22,6 +22,33 @@ const config: Config = {
 
         white: "#FFFFFF",
       },
+      maxWidth: {
+        mainMaxWidth: "calc(100vw - ((100vw - 1180px) / 2))",
+      },
+      minHeight: {
+        mainMinHeight: "656",
+      },
+      gradientColorStops: {
+        custom: {
+          start: "#1ea483",
+          end: "#7465d4",
+        },
+      },
+      linearGradientDirections: {
+        "180": "180deg",
+      },
+      backgroundColor: {
+        footerRgba: "rgba(0, 0, 0, 0.6)",
+      },
+      fontSize: {
+        md: "1.125rem",
+        lg: "1.25rem",
+        xl: "1.5rem",
+        "2xl": "2rem",
+      },
+      translate: {
+        hoverFooter: "110%",
+      },
     },
   },
 
