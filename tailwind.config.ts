@@ -49,6 +49,12 @@ const config: Config = {
       translate: {
         hoverFooter: "110%",
       },
+      gridTemplateColumns: {
+        productGrid: "1fr 1fr",
+      },
+      height: {
+        productHeight: "calc(656px - 0.5rem)",
+      },
     },
   },
 
