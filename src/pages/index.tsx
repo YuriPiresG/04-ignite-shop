@@ -5,6 +5,7 @@ import { useKeenSlider } from "keen-slider/react";
 import { stripe } from "../lib/stripe";
 
 import Stripe from "stripe";
+import Link from "next/link";
 
 interface HomeProps {
   products: {
@@ -27,19 +28,10 @@ export default function Home({ products }: HomeProps) {
       className="keen-slider ml-auto flex min-h-mainMinHeight w-full max-w-mainMaxWidth"
       ref={sliderRef}
     >
-      {/* <a
-        href=""
-        className="keen-slider__slide group relative flex cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-custom-start to-custom-end object-cover"
-      >
-        <Image src={camisa1} alt="Camisa 1" width={520} height={480} />
-        <footer className="absolute bottom-1 left-1 right-1 flex translate-y-hoverFooter items-center justify-between rounded-md bg-footerRgba p-8 opacity-0 transition-all ease-in-out group-hover:translate-y-0 group-hover:opacity-100">
-          <strong className="text-lg">Camiseta X</strong>
-          <span className="text-xl font-bold text-green300">R$ 79,90</span>
-        </footer>
-      </a> */}
       {products.map((product) => {
         return (
-          <div
+          <Link
+            href={`/product/${product.id}`}
             key={product.id}
             className="keen-slider__slide group relative flex cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-custom-start to-custom-end object-cover"
           >
@@ -51,7 +43,7 @@ export default function Home({ products }: HomeProps) {
                 {product.price}
               </span>
             </footer>
-          </div>
+          </Link>
         );
       })}
     </main>
@@ -69,7 +61,10 @@ export const getStaticProps: GetStaticProps = async () => {
       id: product.id,
       name: product.name,
       imageUrl: product.images[0],
-      price: price.unit_amount! / 100,
+      price: new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(price.unit_amount! / 100),
     };
   });
 
