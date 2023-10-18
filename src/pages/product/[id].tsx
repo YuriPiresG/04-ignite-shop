@@ -1,7 +1,9 @@
 import { stripe } from "@/lib/stripe";
+import axios from "axios";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import Stripe from "stripe";
 
 interface ProductProps {
@@ -11,10 +13,30 @@ interface ProductProps {
     imageUrl: string;
     price: string;
     description: string;
+    defaultPriceId: string;
   };
 }
 
 export default function Product({ product }: ProductProps) {
+  const [isCreatingCheckoutSessions, setIsCreatingCheckoutSessions] =
+    useState(false);
+  async function handleBuyProduct() {
+    try {
+      setIsCreatingCheckoutSessions(true);
+
+      const response = await axios.post("/api/checkout", {
+        priceId: product.defaultPriceId,
+      });
+
+      const { checkoutUrl } = response.data;
+
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      setIsCreatingCheckoutSessions(false);
+
+      alert("Falha ao redirecionar ao checkout");
+    }
+  }
   return (
     <main className="mx-auto grid max-w-6xl grid-cols-productGrid items-stretch gap-16 ">
       <div className="flex h-productHeight w-full max-w-lg items-center justify-center rounded-lg bg-gradient-to-t from-custom-start to-custom-end p-1">
@@ -31,7 +53,11 @@ export default function Product({ product }: ProductProps) {
           {product.description}
         </p>
 
-        <button className="mt-auto cursor-pointer rounded-lg border-0 bg-green500 p-5 text-md font-bold text-white hover:bg-green300">
+        <button
+          disabled={isCreatingCheckoutSessions}
+          onClick={handleBuyProduct}
+          className="mt-auto cursor-pointer  rounded-lg border-0 bg-green500 p-5 text-md font-bold text-white hover:bg-green300 disabled:cursor-not-allowed disabled:opacity-60"
+        >
           Comprar agora
         </button>
       </div>
@@ -65,6 +91,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           currency: "BRL",
         }).format(price.unit_amount! / 100),
         description: product.description,
+        defaultPriceId: price.id,
       },
     },
     revalidate: 60 * 60 * 1, // 1 hour
