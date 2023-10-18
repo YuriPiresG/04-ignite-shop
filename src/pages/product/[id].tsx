@@ -1,11 +1,72 @@
+import { stripe } from "@/lib/stripe";
+import { GetStaticPaths, GetStaticProps } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
+import Stripe from "stripe";
 
-export default function Product() {
-  const { query } = useRouter();
+interface ProductProps {
+  product: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    price: string;
+    description: string;
+  };
+}
 
+export default function Product({ product }: ProductProps) {
   return (
-    <div>
-      <h1>Product</h1>
-    </div>
+    <main className="mx-auto grid max-w-6xl grid-cols-productGrid items-stretch gap-16 ">
+      <div className="flex h-productHeight w-full max-w-lg items-center justify-center rounded-lg bg-gradient-to-t from-custom-start to-custom-end p-1">
+        <Image src={product.imageUrl} width={520} height={480} alt="" />
+      </div>
+
+      <div className="flex flex-col">
+        <h1 className="text-2xl text-gray300">{product.name}</h1>
+        <span className="mt-4 block text-2xl text-green300">
+          {product.price}
+        </span>
+
+        <p className="mt-10 text-md leading-6 text-gray300">
+          {product.description}
+        </p>
+
+        <button className="mt-auto cursor-pointer rounded-lg border-0 bg-green500 p-5 text-md font-bold text-white hover:bg-green300">
+          Comprar agora
+        </button>
+      </div>
+    </main>
   );
 }
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const productId = String(params.id);
+
+  const product = await stripe.products.retrieve(productId, {
+    expand: ["default_price"],
+  });
+  const price = product.default_price as Stripe.Price;
+
+  return {
+    props: {
+      product: {
+        id: product.id,
+        name: product.name,
+        imageUrl: product.images[0],
+        price: new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(price.unit_amount! / 100),
+        description: product.description,
+      },
+    },
+    revalidate: 60 * 60 * 1, // 1 hour
+  };
+};
