@@ -24,6 +24,7 @@ const config: Config = {
       },
       maxWidth: {
         mainMaxWidth: "calc(100vw - ((100vw - 1180px) / 2))",
+        successProduct: "130",
       },
       minHeight: {
         mainMinHeight: "656",
@@ -54,6 +55,7 @@ const config: Config = {
       },
       height: {
         productHeight: "calc(656px - 0.5rem)",
+        successProduct: "145",
       },
     },
   },
